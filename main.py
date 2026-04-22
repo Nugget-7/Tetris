@@ -1,7 +1,9 @@
 import pygame
 from copy import deepcopy
 from random import randrange, choice
-from button import Button
+
+# Libreria de componentes de Feli
+from PygameComponents.Fbutton import FButton
 
 W, H = 10, 20
 TILE = 37
@@ -37,8 +39,15 @@ colors = [
     (160, 0, 160)     # T - purple
 ]
 
-color_opcion1 = (80, 47, 120)
-color_opcion2 = (80, 47, 120)
+# Colores constantes
+COLOR_BTN_NORMAL = (80, 47, 120)
+COLOR_BTN_HOVER = (176, 201, 15)
+
+# Tarea
+# IMAGEN_NORMAL = "imagenes/folder_Vacio.png"
+# IMAGEN_ON_HOVER = "imagenes/folder_lleno.png"
+# button1 = FButton(....... IMAGEN_NORMAL, IMAGEN_ON_HOVER)
+
 
 figures = [[pygame.Rect(x + W // 2, y + 1, 1, 1) for x, y in fig_pos] for fig_pos in figures_pos]
 figure_rect = pygame.Rect(0, 0, TILE - 2, TILE - 2)
@@ -98,23 +107,41 @@ def set_record(record, score):
     with open('record.txt', 'w') as f:
         f.write(str(rec))
 
+# tarea
+# def guardar_puntaje y jugador:
+
+# tarea
+# leer de archivo para cargar el ranking
+
 while True:
     mouse_pos = pygame.mouse.get_pos()
 
-    opcion1 = Button(232, 280, 215, 65, ">Play", color_opcion1, main_font)
-    opcion2 = Button(180, 480, 360, 65, ">Ranking", color_opcion2, main_font)
+    opcion1 = FButton(232, 280, 215, 65, ">Play", COLOR_BTN_NORMAL, COLOR_BTN_HOVER, main_font)
+    opcion2 = FButton(180, 480, 360, 65, ">Ranking", COLOR_BTN_NORMAL, COLOR_BTN_HOVER, main_font)
 
-    if opcion1.hover(mouse_pos):
-        color_opcion1 = (176, 201, 15)
-        if opcion1.click():
-            jugando = True
-    else:
-        color_opcion1 = (80, 47, 120)
+    opcion1.hover(mouse_pos)
+    # if opcion1.hover(mouse_pos):
+        # 1color_opcion1 = (176, 201, 15)
 
-    if opcion2.hover(mouse_pos):
-        color_opcion2 = (176, 201, 15)
-    else:
-        color_opcion2 = (80, 47, 120)
+    # VERSION ANTIGUA
+    # if opcion1.click():
+        # jugando = True
+
+    # MEJORA
+    jugando = opcion1.click()
+
+    # 2 else:
+    #  3   color_opcion1 = (80, 47, 120)
+
+    opcion2.hover(mouse_pos)
+    # if opcion2.hover(mouse_pos):
+        # 4 color_opcion2 = (176, 201, 15)
+    # 5else:
+      # 6 color_opcion2 = (80, 47, 120)
+
+    # Tarea 
+    if opcion2.click():
+        print("Mostrar la ventana de ranking con datos reales")
 
     sc.blit(bg, (0, 0))
     for event in pygame.event.get():
