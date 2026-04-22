@@ -1,6 +1,7 @@
 import pygame
 from copy import deepcopy
 from random import randrange, choice
+from button import Button
 
 W, H = 10, 20
 TILE = 37
@@ -100,19 +101,17 @@ def set_record(record, score):
 while True:
     mouse_pos = pygame.mouse.get_pos()
 
-    opcion1 = main_font.render('>Play', True, color_opcion1)
-    opcion2 = main_font.render('>Ranking', True, color_opcion2)
+    opcion1 = Button(232, 280, 215, 65, ">Play", color_opcion1, main_font)
+    opcion2 = Button(180, 480, 360, 65, ">Ranking", color_opcion2, main_font)
 
-    if (mouse_pos[0] > 232 and mouse_pos[0] < 447) and (mouse_pos[1] > 280 and mouse_pos[1] < 345):
+    if opcion1.hover(mouse_pos):
         color_opcion1 = (176, 201, 15)
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                jugando = True
-                break
+        if opcion1.click():
+            jugando = True
     else:
         color_opcion1 = (80, 47, 120)
 
-    if (mouse_pos[0] > 180 and mouse_pos[0] < 505) and (mouse_pos[1] > 480 and mouse_pos[1] < 545):
+    if opcion2.hover(mouse_pos):
         color_opcion2 = (176, 201, 15)
     else:
         color_opcion2 = (80, 47, 120)
@@ -121,6 +120,9 @@ while True:
     for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
+
+    opcion1 = opcion1.txt_img
+    opcion2 = opcion2.txt_img
 
     sc.blit(title_tetris_menu, (222, 20))
     sc.blit(opcion1, (232, 280))
