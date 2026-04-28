@@ -4,7 +4,6 @@ from random import randrange, choice
 
 # Libreria de componentes de Feli
 from PygameComponents.Fbutton import FButton
-import random
 
 W, H = 10, 20
 TILE = 37
@@ -121,7 +120,6 @@ while True:
     opcion1 = FButton(232, 280, 215, 65, ">Play", COLOR_BTN_NORMAL, COLOR_BTN_HOVER, main_font)
     opcion2 = FButton(180, 480, 360, 65, ">Ranking", COLOR_BTN_NORMAL, COLOR_BTN_HOVER, main_font)
 
-    hover_1 = opcion1.hover(mouse_pos)
     # if opcion1.hover(mouse_pos):
         # 1color_opcion1 = (176, 201, 15)
 
@@ -134,96 +132,42 @@ while True:
     # 2 else:
     #  3   color_opcion1 = (80, 47, 120)
 
-    hover_2 = opcion2.hover(mouse_pos)
     # if opcion2.hover(mouse_pos):
         # 4 color_opcion2 = (176, 201, 15)
     # 5else:
     # 6 color_opcion2 = (80, 47, 120)
 
     # Tarea 
-    #if opcion2.click():🍔
-        #ranking = True 🍔
-    
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            exit()
 
-        if opcion1.click(event):
+    if opcion1.hover(mouse_pos):
+        if opcion1.click():
             jugando = True
 
-        if opcion2.click(event):
+    elif opcion2.hover(mouse_pos):
+        if opcion2.click():
             ranking = True
 
     sc.blit(bg, (0, 0))
+    for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
 
-    opcion1_txt = opcion1.txt_img
-    opcion2_txt = opcion2.txt_img
+    opcion1 = opcion1.txt_img
+    opcion2 = opcion2.txt_img
 
     sc.blit(title_tetris_menu, (222, 20))
-    sc.blit(opcion1_txt, (232, 280))
-    sc.blit(opcion2_txt, (180, 480))
+    sc.blit(opcion1, (232, 280))
+    sc.blit(opcion2, (180, 480))
 
-    if jugando:
-        break
     if ranking:
+        break
+    if jugando:
         break
 
     pygame.display.flip()
     clock.tick(FPS)
 
-if ranking:
-        puntaje_1, puntaje_2, puntaje_3 = random.randint(800, 1800), random.randint(1800, 3500), random.randint(3500, 5000)
-        while ranking:
-            sc.blit(bg, (0, 0))
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT: 
-                    exit()
-
-            record = get_record()
-
-            lista_pos = [(70, 150), (70, 300), (70, 450), (70, 600)]
-            if int(record) > 1800:
-                if int(record)> 3500:
-                    if int(record) > 5000:
-                        jugador_pos = lista_pos[0]
-                        persona1_pos = lista_pos[3]
-                        persona2_pos = lista_pos[2]
-                        persona3_pos = lista_pos[1]
-                        ranking_pos = ["4. ", "3. ", "2. ", "1. "]
-                    else:
-                        jugador_pos = lista_pos[1]
-                        persona1_pos = lista_pos[3]
-                        persona2_pos = lista_pos[2]
-                        persona3_pos = lista_pos[0]
-                        ranking_pos = ["4. ", "3. ", "1. ", "2. "]
-                else:
-                    jugador_pos = lista_pos[2]
-                    persona1_pos = lista_pos[3]
-                    persona2_pos = lista_pos[1]
-                    persona3_pos = lista_pos[0]
-                    ranking_pos = ["4. ", "2. ", "1. ", "3. "]
-            else:
-                jugador_pos = lista_pos[3]
-                persona1_pos = lista_pos[2]
-                persona2_pos = lista_pos[1]
-                persona3_pos = lista_pos[0]
-                ranking_pos = ["3. ", "2. ", "1. ", "4. "]
-
-            persona_1 = font.render(f"{ranking_pos[0]}Daniel - Score: {puntaje_1}", True, (80, 47, 120))
-            persona_2 = font.render(f"{ranking_pos[1]}Juan - Score: {puntaje_2}", True, (80, 47, 120))
-            persona_3 = font.render(f"{ranking_pos[2]}Maria - Score: {puntaje_3}", True, (80, 47, 120))
-            jugador = font.render(f"{ranking_pos[3]}You - Score: {record}", True, (80, 47, 120))
-
-            sc.blit(title_tetris_menu, (222, 20))
-            sc.blit(persona_1, (persona1_pos[0], persona1_pos[1]))
-            sc.blit(persona_2, (persona2_pos[0], persona2_pos[1]))
-            sc.blit(persona_3, (persona3_pos[0], persona3_pos[1]))
-            sc.blit(jugador, (jugador_pos[0], jugador_pos[1]))
-
-            pygame.display.flip()
-            clock.tick(FPS)
-
-elif jugando:
+if jugando:
     while True:
         record = get_record()
         dx, rotate = 0, False
@@ -348,3 +292,12 @@ elif jugando:
         sc.blit(game_sc, (20, 20))
         pygame.display.flip()
         clock.tick(FPS)
+
+elif ranking:
+        while ranking:
+            sc.fill((0, 0, 0)) # Clean empty screen
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: exit()
+                if event.type == pygame.KEYDOWN: ranking = False
+            pygame.display.flip()
+            clock.tick(FPS)
