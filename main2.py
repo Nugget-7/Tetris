@@ -120,6 +120,7 @@ while True:
     opcion1 = FButton(232, 280, 215, 65, ">Play", COLOR_BTN_NORMAL, COLOR_BTN_HOVER, main_font)
     opcion2 = FButton(180, 480, 360, 65, ">Ranking", COLOR_BTN_NORMAL, COLOR_BTN_HOVER, main_font)
 
+    hover_1 = opcion1.hover(mouse_pos)
     # if opcion1.hover(mouse_pos):
         # 1color_opcion1 = (176, 201, 15)
 
@@ -132,36 +133,38 @@ while True:
     # 2 else:
     #  3   color_opcion1 = (80, 47, 120)
 
+    hover_2 = opcion2.hover(mouse_pos)
     # if opcion2.hover(mouse_pos):
         # 4 color_opcion2 = (176, 201, 15)
     # 5else:
     # 6 color_opcion2 = (80, 47, 120)
 
     # Tarea 
+    #if opcion2.click():
+        #ranking = True 
+    
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            exit()
 
-    if opcion1.hover(mouse_pos):
-        if opcion1.click():
+        if opcion1.click(event):
             jugando = True
 
-    elif opcion2.hover(mouse_pos):
-        if opcion2.click():
+        if opcion2.click(event):
             ranking = True
 
     sc.blit(bg, (0, 0))
-    for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                exit()
 
-    opcion1 = opcion1.txt_img
-    opcion2 = opcion2.txt_img
+    opcion1_txt = opcion1.txt_img
+    opcion2_txt = opcion2.txt_img
 
     sc.blit(title_tetris_menu, (222, 20))
-    sc.blit(opcion1, (232, 280))
-    sc.blit(opcion2, (180, 480))
+    sc.blit(opcion1_txt, (232, 280))
+    sc.blit(opcion2_txt, (180, 480))
 
-    if ranking:
-        break
     if jugando:
+        break
+    if ranking:
         break
 
     pygame.display.flip()
@@ -293,11 +296,11 @@ if jugando:
         pygame.display.flip()
         clock.tick(FPS)
 
-elif ranking:
-        while ranking:
-            sc.fill((0, 0, 0)) # Clean empty screen
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT: exit()
-                if event.type == pygame.KEYDOWN: ranking = False
-            pygame.display.flip()
-            clock.tick(FPS)
+#elif ranking:
+        #while ranking:
+            #sc.fill((0, 0, 0)) # Clean empty screen
+            #for event in pygame.event.get():
+                #if event.type == pygame.QUIT: exit()
+                #if event.type == pygame.KEYDOWN: ranking = False
+            #pygame.display.flip()
+            #clock.tick(FPS)
