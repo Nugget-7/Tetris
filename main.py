@@ -30,12 +30,16 @@ TILE = 37
 GAME_RES = W * TILE, H * TILE
 RES = 700, 785
 FPS = 60
+pygame.display.set_caption("Tetris!")
+pygame.display.set_icon(pygame.image.load("Assets/Logo.webp"))
 jugando = False
 in_ranking = False
 pidiendo_nombre = False
 in_settings = False
 sfx_volume = 1
 music_volume = 0.3
+dificultad = 2
+aumento_velocidad = 10
 
 pygame.init()
 pygame.mixer.init()
@@ -199,12 +203,16 @@ def format_to_time(time):
 
 
 def set_deafaults():
-    global score, lines, color, figure_index, next_color, next_figure_index, hard_drop, figures, figures_pos, figure_rect, anim_count, anim_speed, anim_limit, field, W, H, grid, secs, mins, title_time, main_font, figure, figure_old
+    global score, lines, color, figure_index, next_color, next_figure_index, hard_drop, figures, figures_pos, figure_rect, anim_count, anim_speed, anim_limit, field, W, H, grid, secs, mins, title_time, main_font, figure, figure_old, secs_count, next_figure
     score, lines = 0, 0
     hard_drop = False
+    figures = [[pygame.Rect(x + W // 2, y + 1, 1, 1) for x, y in fig_pos] for fig_pos in figures_pos]
     figure_index = randrange(len(figures))
     next_figure_index = randrange(len(figures))
-    figures = [[pygame.Rect(x + W // 2, y + 1, 1, 1) for x, y in fig_pos] for fig_pos in figures_pos]
+    figure = deepcopy(figures[figure_index])
+    next_figure = deepcopy(figures[next_figure_index])
+    color = colors[figure_index]
+    next_color = colors[next_figure_index]
     figure_rect = pygame.Rect(0, 0, TILE - 2, TILE - 2)
     anim_count, anim_speed, anim_limit = 0, 40, 2000
     field = [[0 for i in range(W)] for i in range(H)]
@@ -212,9 +220,9 @@ def set_deafaults():
     secs = 1
     mins = 0
     title_time = main_font.render('00:01', True, pygame.Color('white'))
-    y_max = max_y(figure[figure_index + 1])
-    for f in figure:
-        f.y -= y_max
+    #y_max = max_y([f.y for f in figure])
+    #for f in figure:
+    #    f.y -= y_max / 2 / 2
 
 def max_y(lista):
     maximo = -1
@@ -230,11 +238,17 @@ def max_y(lista):
 # leer de archivo para cargar el ranking
 
 def ranking():
-        while ranking:
+        global in_ranking
+        in_ranking = True
+        while in_ranking:
             sc.blit(bg, (0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: 
                     exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        in_ranking = False
+                        menu()
 
             jugadores_ordenados = sorted(jugadores, key=lambda j: j.puntaje, reverse=True)
 
@@ -260,17 +274,21 @@ def ranking():
             clock.tick(FPS)
 
 def settings_funcion():
-    global music_volume, sfx_volume
+    global music_volume, sfx_volume, dificultad, aumento_velocidad
     not_salir = True
     setting_entrys = [Fentry(400, 250, 100, 45, str(sfx_volume), numeric=True, font=small_retro_font ,max_len=5, bg_color=(92, 63, 128), bg_color_active=COLOR_BTN_NORMAL,
                         border_color=(156, 156, 168), border_color_active=(255, 255, 255), place_holder_color=COLOR_BTN_HOVER, cursor_color=(0, 0, 0),
                         txt_color=COLOR_BTN_HOVER), 
                         Fentry(450, 159.5, 100, 45, str(music_volume), numeric=True, font=small_retro_font ,max_len=5, bg_color=(92, 63, 128), bg_color_active=COLOR_BTN_NORMAL,
                         border_color=(156, 156, 168), border_color_active=(255, 255, 255), place_holder_color=COLOR_BTN_HOVER, cursor_color=(0, 0, 0),
+                        txt_color=COLOR_BTN_HOVER),
+                        Fentry(335, 355, 100, 45, str(dificultad), numeric=True, font=small_retro_font ,max_len=5, bg_color=(92, 63, 128), bg_color_active=COLOR_BTN_NORMAL,
+                        border_color=(156, 156, 168), border_color_active=(255, 255, 255), place_holder_color=COLOR_BTN_HOVER, cursor_color=(0, 0, 0),
                         txt_color=COLOR_BTN_HOVER)]
     while not_salir:
         setting_entrys[0].place_holder = str(sfx_volume)
         setting_entrys[1].place_holder = str(music_volume)
+        setting_entrys[2].place_holder = str(dificultad)
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -290,6 +308,21 @@ def settings_funcion():
 
         if setting_entrys[0].get_value() != "":
             sfx_volume = float(setting_entrys[0].get_value())
+        
+        if setting_entrys[2].get_value() != "":
+            dificultad = float(setting_entrys[2].get_value())
+            dificultad = round(dificultad)
+            if dificultad > 3:
+                dificultad = 3
+            elif dificultad < 1:
+                dificultad = 1
+        
+        if dificultad == 1:
+            aumento_velocidad = 7
+        elif dificultad == 2:
+            aumento_velocidad = 10
+        elif dificultad == 3:
+            aumento_velocidad = 15
 
         line_clear_sound.set_volume(sfx_volume)
         pygame.mixer.music.set_volume(music_volume)
@@ -324,10 +357,13 @@ def pedir_nombre():
             if event.type == pygame.QUIT:
                 exit()
             name.handle_event(event)
+            if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        salir = False
+                        menu()
 
             if submit.click(event):
                 if data.replace("_", "") != "":
-                    print(data)
                     nombre_j = data
                     flag_jugar = True
                     salir = True
@@ -353,7 +389,7 @@ def pedir_nombre():
 def jugar():
     set_deafaults()
     global puntajes, nombre_j, lines, figure, anim_count, anim_speed, anim_limit, field, score, color, next_color, next_figure, title_time
-    global secs_count, secs, mins, next_figure_index, hard_drop, figure_old
+    global secs_count, secs, mins, next_figure_index, hard_drop, figure_old, aumento_velocidad, dificultad
     pygame.mixer.music.play(-1)
     salir = False
     while not salir:
@@ -440,7 +476,6 @@ def jugar():
             if count < W:
                 line -= 1
             else:
-                anim_speed += 3
                 lines += 1
 
         score += scores[lines]
@@ -496,9 +531,10 @@ def jugar():
             secs += 1
             title_time = main_font.render(f'{format_to_time(mins)}:{format_to_time(secs)}', True, pygame.Color('white'))
             if secs % 15 == 0:
-                anim_speed += 10
+                anim_speed += aumento_velocidad
             if secs % 60 == 0:
                 mins += 1
+                secs = 0
 
 def menu():
     global in_ranking, in_settings, flag_jugar
